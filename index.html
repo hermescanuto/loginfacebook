@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Teste de Login</title>
+</head>
+<style media="screen">
+  body {
+    font-size: 14px;
+    font-family: monospace;
+  }
+</style>
+
+<body>
+
+  <p>Teste de login</p>
+  <p id="logado"></p>
+  <p>
+    <img id="foto" src="" alt="">
+  </p>
+  <p>
+    <img id="cover" src="" alt="">
+  </p>
+
+  <p id="resto"></p>
+
+  <p>
+    <fb:login-button scope="public_profile,email,user_birthday,user_about_me" onlogin="checkLoginState();">
+    </fb:login-button>
+  </p>
+
+  <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId: '131517117535522',
+        cookie: true,
+        xfbml: true,
+        version: 'v2.11'
+      });
+
+      FB.AppEvents.logPageView();
+
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+
+    };
+
+    (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {
+        return;
+      }
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    function checkLoginState() {
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+    }
+
+    function statusChangeCallback(response) {
+      console.log(response)
+      if (response.status == "not_authorized") {
+        document.getElementById("logado").innerHTML = "Está Logado , mas não autorizado"
+      } else if (response.status == "connected") {
+        document.getElementById("logado").innerHTML = "Está Logado , e conectado"
+        testAPI();
+      }
+
+    }
+
+    function testAPI() {
+      var id = null;
+      console.log('Welcome!  Fetching your information.... ');
+      FB.api('/me', {
+        fields: 'name,email,cover,first_name,last_name,link,gender,locale,picture,birthday'
+      }, function(response) {
+        console.log("1-----------------");
+        console.log(response);
+        if (response.birthday) {
+          var d = response.birthday.split("/");
+          var data = d[1] + "/" + d[0] + "/" + d[2];
+        } else {
+          var d = response.birthday;
+        }
+        document.getElementById("resto").innerHTML = "";
+        document.getElementById("resto").innerHTML += "<b>ID: </b>" + response.id + "<br>";
+        document.getElementById("resto").innerHTML += "<b>name: </b>" + response.name + "<br>";
+        document.getElementById("resto").innerHTML += "<b>email: </b>" + response.email + "<br>";
+        document.getElementById("resto").innerHTML += "<b>first_name: </b>" + response.first_name + "<br>";
+        document.getElementById("resto").innerHTML += "<b>last_name: </b>" + response.last_name + "<br>";
+        document.getElementById("resto").innerHTML += "<b>birthday: </b>" + data + "<br>";
+        document.getElementById("resto").innerHTML += "<b>link: </b>" + response.link + "<br>";
+        document.getElementById("resto").innerHTML += "<b>gender: </b>" + response.gender + "<br>";
+        document.getElementById("resto").innerHTML += "<b>locale: </b>" + response.locale + "<br>";
+        document.getElementById("foto").src = response.picture.data.url;
+        document.getElementById("cover").src = response.cover.source;
+
+      });
+    }
+  </script>
+</body>
+
+</html>
